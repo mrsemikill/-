@@ -1,0 +1,181 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ---- Кнопка "Наверх" ----
+    const backBtn = document.getElementById('backToTop');
+    function toggleBackButton() {
+        if (window.scrollY > 300) {
+            backBtn.classList.add('visible');
+        } else {
+            backBtn.classList.remove('visible');
+        }
+    }
+    window.addEventListener('scroll', toggleBackButton, { passive: true });
+    window.addEventListener('resize', toggleBackButton, { passive: true });
+    toggleBackButton();
+    backBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ---- Обработка ссылок ----
+    const links = document.querySelectorAll('a[href^="#"]');
+
+    function updateActiveLink(hash) {
+        links.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`a[href="${hash}"]`);
+        if (activeLink) activeLink.classList.add('active');
+    }
+
+    function openParents(el) {
+        let p = el;
+        while (p) {
+            if (p.tagName === "DETAILS") {
+                if (!p.open) {
+                    p.open = true;
+                    const summary = p.querySelector('summary');
+                    if (summary && !p.open) {
+                        summary.click();
+                    }
+                }
+            }
+            p = p.parentElement;
+        }
+        if (el.tagName === "DETAILS" && !el.open) {
+            el.open = true;
+            const summary = el.querySelector('summary');
+            if (summary && !el.open) {
+                summary.click();
+            }
+        }
+    }
+
+    function go(hash, push = true) {
+        if (!hash) return;
+        const id = hash.replace('#', '');
+        const el = document.getElementById(id);
+        if (!el) return;
+        openParents(el);
+        setTimeout(function() {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+        if (push && location.hash !== hash) {
+            history.pushState(null, '', hash);
+        }
+        updateActiveLink(hash);
+    }
+
+    links.forEach(function(a) {
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            go(this.getAttribute('href'));
+        });
+    });
+
+    window.addEventListener('hashchange', function() {
+        go(location.hash, false);
+    });
+
+    if (location.hash) {
+        setTimeout(function() {
+            go(location.hash, false);
+        }, 100);
+    }
+
+    // ---- Аккордеон ----
+    function closeAllNestedDetails(parent) {
+        const details = parent.querySelectorAll('details');
+        details.forEach(d => d.open = false);
+    }
+
+    let _ignoreAccordion = false;
+
+    const blocks = document.querySelectorAll('.block');
+    blocks.forEach(function(block) {
+        block.addEventListener('toggle', function(e) {
+            if (_ignoreAccordion) return;
+            if (this.open) {
+                blocks.forEach(function(other) {
+                    if (other !== this && other.open) {
+                        other.open = false;
+                        closeAllNestedDetails(other);
+                    }
+                });
+            } else {
+                closeAllNestedDetails(this);
+            }
+        });
+    });
+
+    const subBlocks = document.querySelectorAll('.sub-block');
+    subBlocks.forEach(function(sub) {
+        sub.addEventListener('toggle', function(e) {
+            if (_ignoreAccordion) return;
+            if (this.open) {
+                subBlocks.forEach(function(other) {
+                    if (other !== this && other.open) {
+                        other.open = false;
+                        closeAllNestedDetails(other);
+                    }
+                });
+            }
+        });
+    });
+
+    const allDetails = document.querySelectorAll('.hardware-detail, .material-detail');
+    allDetails.forEach(function(detail) {
+        detail.addEventListener('toggle', function(e) {
+            if (_ignoreAccordion) return;
+            if (this.open) {
+                allDetails.forEach(function(other) {
+                    if (other !== this && other.open) {
+                        other.open = false;
+                    }
+                });
+            }
+        });
+    });
+
+    // ---- Кнопки "Развернуть всё" / "Свернуть всё" ----
+    const expandBtn = document.getElementById('expandAllBtn');
+    const collapseBtn = document.getElementById('collapseAllBtn');
+
+    function getAllDetails() {
+        return document.querySelectorAll('.container details');
+    }
+
+    expandBtn.addEventListener('click', function() {
+        _ignoreAccordion = true;
+        const all = getAllDetails();
+        all.forEach(function(d) {
+            if (!d.open) {
+                d.open = true;
+                const summary = d.querySelector('summary');
+                if (summary && !d.open) {
+                    summary.click();
+                }
+            }
+        });
+        setTimeout(function() { _ignoreAccordion = false; }, 200);
+    });
+
+    collapseBtn.addEventListener('click', function() {
+        _ignoreAccordion = true;
+        getAllDetails().forEach(function(d) {
+            if (d.open) {
+                d.open = false;
+            }
+        });
+        setTimeout(function() { _ignoreAccordion = false; }, 200);
+    });
+
+    // ---- aria-expanded ----
+    document.querySelectorAll('details').forEach(function(d) {
+        d.addEventListener('toggle', function() {
+            const s = d.querySelector('summary');
+            if (s) s.setAttribute('aria-expanded', d.open ? 'true' : 'false');
+        });
+        const s = d.querySelector('summary');
+        if (s) s.setAttribute('aria-expanded', d.open ? 'true' : 'false');
+    });
+});
+</script>
