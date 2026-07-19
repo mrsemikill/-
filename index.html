@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ru" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Honda Accord 6: Бортовой Журнал</title>
+    <style>
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    padding: max(15px, env(safe-area-inset-top)) max(15px, env(safe-area-inset-right)) max(15px, env(safe-area-inset-bottom)) max(15px, env(safe-area-inset-left));
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-tap-highlight-color: transparent;
+    background: #0b0b12;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(30, 144, 255, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(147, 112, 219, 0.06) 0%, transparent 40%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 2px, transparent 2px, transparent 8px);
+    background-repeat: repeat, repeat, repeat;
+    color: var(--text);
+    min-height: 100vh;
+    position: relative;
+}
+
+.bg-auto-sound {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+.bg-auto-sound .speaker-ring { fill: none; stroke: #c0d0e0; stroke-width: 0.9; opacity: 0.9; }
+.bg-auto-sound .speaker-cone { fill: none; stroke: #8a9ba8; stroke-width: 0.5; opacity: 0.7; }
+.bg-auto-sound .speaker-center { fill: #3a4a5a; stroke: #6a7a8a; stroke-width: 0.5; }
+.bg-auto-sound .hu-body { fill: none; stroke: #b0c4de; stroke-width: 0.8; opacity: 0.8; }
+.bg-auto-sound .hu-screen { fill: none; stroke: #32cd32; stroke-width: 0.5; opacity: 0.7; }
+.bg-auto-sound .hu-btn { fill: #2d3748; stroke: #4a5568; stroke-width: 0.3; }
+
+.bg-auto-sound .wire {
+    fill: none;
+    stroke-width: 0.8;
+    stroke-dasharray: 2 3;
+    stroke-linecap: round;
+}
+.bg-auto-sound .wire-blue { stroke: rgba(30,144,255,0.9); }
+.bg-auto-sound .wire-purple { stroke: rgba(147,112,219,0.9); }
+.bg-auto-sound .wire-orange { stroke: rgba(255,140,0,0.9); }
+.bg-auto-sound .wire-green { stroke: rgba(50,205,50,0.9); }
+.bg-auto-sound .wire-red { stroke: rgba(255,69,0,0.9); }
+
+.bg-auto-sound .dot {
+    fill: #32cd32;
+    r: 1.1;
+}
+.bg-auto-sound .dot-blue { fill: #1e90ff; }
+.bg-auto-sound .dot-purple { fill: #9370db; }
+.bg-auto-sound .dot-orange { fill: #ff8c00; }
+.bg-auto-sound .dot-red { fill: #ff4500; }
+
+@media (max-width: 640px) {
+    .bg-auto-sound { opacity: 0.6; }
+}
+
+:root { 
+    --bg: transparent; 
+    --card-bg: rgba(20, 20, 28, 0.7);
+    --inner-bg: rgba(20, 20, 28, 0.7);
+    --text: #e2e8f0; 
+    --c1: #1e90ff; 
+    --c2: #9370db; 
+    --c3: #ff8c00; 
+    --c4: #ff4500; 
+    --accent: #32cd32; 
+}
+        
+.container { 
+    max-width: 700px; 
+    margin: 0 auto; 
+    display: block; 
+    width: 100%; 
+    padding: 0 20px; 
+    position: relative; 
+    z-index: 1; 
+}
+.header { text-align: center; background: var(--card-bg); padding: 30px 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); border-left: 6px solid var(--accent); margin-bottom: 25px; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.06); }
+.header h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: #fff; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+        
+.toc-box { background: var(--card-bg); border-radius: 10px; padding: 20px; margin-bottom: 25px; border-left: 5px solid #a0aec0; box-shadow: 0 4px 10px rgba(0,0,0,0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.06); }
+.toc-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.5); }
+.toc-list { list-style: none; padding-left: 0; margin: 0; }
+.toc-list > li { margin-bottom: 12px; font-weight: bold; font-size: 15px; }
+.toc-list a { text-decoration: none; transition: all 0.2s; cursor: pointer; display: inline-block; padding: 2px 4px; border-radius: 4px; color: #b0c4de; }
+.toc-list a:hover { opacity: 0.8; text-decoration: underline; }
+
+.toc-sublist { list-style: none; padding-left: 28px; margin: 6px 0 0 0; }
+.toc-sublist li { margin-bottom: 4px; font-weight: normal; font-size: 14px; }
+.toc-sublist a { color: #a0b8d0 !important; }
+.toc-sublist a:hover { color: #fff !important; text-decoration: underline; }
+
+.toc-list a.active, .toc-sublist a.active {
+    color: var(--accent) !important;
+    font-weight: bold;
+    text-decoration: underline;
+    background: rgba(50, 205, 50, 0.15);
+    border-radius: 4px;
+}
+
+details.block { background: var(--card-bg); border-radius: 10px; margin-bottom: 22px; border-left: 5px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: block; width: 100%; scroll-margin-top: 20px; overflow: hidden; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.06); }
+details.block-hardware { border-left-color: var(--c1); } 
+details.block-shumka { border-left-color: var(--c2); } 
+details.block-commutation { border-left-color: var(--c3); } 
+details.block-processor { border-left-color: var(--c4); }
+        
+summary.block-title, summary.sub-block-title, summary.hardware-detail-summary, summary.material-summary {
+    -webkit-appearance: none; appearance: none; list-style: none;
+    background: rgba(255,255,255,0.02); border: none; outline: none;
+    text-align: left; font-family: inherit; font-weight: bold;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; user-select: none; padding: 20px;
+    font-size: 17px; width: 100%;
+    color: #fff;
+}
+summary.block-title::-webkit-details-marker,
+summary.sub-block-title::-webkit-details-marker,
+summary.hardware-detail-summary::-webkit-details-marker,
+summary.material-summary::-webkit-details-marker { display: none !important; }
+summary.block-title:hover, summary.sub-block-title:hover,
+summary.hardware-detail-summary:hover, summary.material-summary:hover { background: rgba(255,255,255,0.05); }
+        
+.block-hardware .block-title { color: var(--c1); } 
+.block-shumka .block-title { color: var(--c2); } 
+.block-commutation .block-title { color: var(--c3); } 
+.block-processor .block-title { color: var(--c4); }
+
+.block-content { padding: 20px; }
+.sub-block-content { padding: 15px; }
+
+details.sub-block { background: var(--inner-bg); border-radius: 8px; margin-bottom: 20px; border: 1px solid #2d2d38; display: block; width: 100%; scroll-margin-top: 20px; overflow: hidden; backdrop-filter: blur(4px); }
+details.sub-block:last-child { margin-bottom: 0; }
+summary.sub-block-title { font-size: 15px; padding: 15px; }
+
+.c-subbass .sub-block-title { color: var(--c1); }
+.c-midbass .sub-block-title { color: var(--accent); }
+.c-vocal .sub-block-title { color: var(--c3); }
+.c-tweeter .sub-block-title { color: var(--c4); }
+
+details.hardware-detail, details.material-detail {
+    background: var(--inner-bg); border-radius: 8px; margin-bottom: 16px; border: 1px solid #2d2d38; display: block; width: 100%; overflow: hidden;
+}
+details.hardware-detail:last-child, details.material-detail:last-child { margin-bottom: 0; }
+summary.hardware-detail-summary, summary.material-summary {
+    font-size: 15px; padding: 15px; color: #fff; background: rgba(255,255,255,0.03);
+    display: flex; align-items: center; gap: 12px;
+}
+summary.hardware-detail-summary .hardware-detail-title,
+summary.material-summary .material-title { font-weight: bold; display: inline-block; border-bottom: 1px solid #2d2d38; padding-bottom: 2px; }
+summary.hardware-detail-summary .hardware-detail-preview,
+summary.material-summary .material-preview { font-weight: normal; font-size: 13px; color: #a0aec0; margin-left: 10px; }
+.hardware-detail-content, .material-detail-content { padding: 0 15px 15px 15px; }
+
+.detail-photo {
+    display: block;
+    margin: 0 auto 12px;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 1.2;
+    border-radius: 6px;
+    border: 1px solid #2d2d38;
+    background: rgba(11,11,18,0.8);
+}
+
+.arrow-icon, .sub-arrow-icon, .hardware-arrow-icon, .material-arrow-icon {
+    font-size: 13px; transition: transform 0.2s ease; transform: rotate(-90deg); pointer-events: none;
+}
+details[open] > summary .arrow-icon,
+details[open] > summary .sub-arrow-icon,
+details[open] > summary .hardware-arrow-icon,
+details[open] > summary .material-arrow-icon,
+details:target > summary .arrow-icon,
+details:target > summary .sub-arrow-icon,
+details:target > summary .hardware-arrow-icon,
+details:target > summary .material-arrow-icon { transform: rotate(0deg) !important; }
+
+.frequency-card { background: rgba(26,26,34,0.85); padding: 14px; border-radius: 6px; border: 1px solid #2d2d38; margin-bottom: 14px; }
+.frequency-card:last-child { margin-bottom: 0; }
+.freq-header { font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 8px; border-bottom: 1px solid #2d2d38; padding-bottom: 4px; display: inline-block; }
+.info-card { background: var(--card-bg); border-radius: 6px; padding: 15px; border: 1px solid #25252d; margin-bottom: 25px; }
+.spec-list { margin: 0; padding-left: 20px; font-size: 13px; }
+.spec-list li { margin-bottom: 5px; }
+.lang-line { margin-bottom: 8px; font-size: 13px; }
+.lang-badge { font-weight: bold; text-transform: uppercase; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-right: 6px; display: inline-block; background: #2d3748; color: #a0aec0; }
+        
+.c-subbass .lang-badge { background: #2b6cb0; color: #ebf8ff; }
+.c-midbass .lang-badge { background: #2f855a; color: #f0fff4; }
+.c-vocal .lang-badge { background: #c05621; color: #fffaf0; }
+.c-tweeter .lang-badge { background: #9b2c2c; color: #fff5f5; }
+        
+.alert-text, .hit-mark { color: #ff4500; font-weight: bold; }
+.accent-text { color: var(--accent); font-weight: bold; }
+
+.controls { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+.controls button {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid #2d2d38;
+    color: #e2e8f0;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+}
+.controls button:hover { background: rgba(255,255,255,0.12); border-color: var(--accent); color: #fff; }
+
+.footer { margin: 24px 0 0; padding: 16px; text-align: center; color: #a0aec0; font-size: 13px; border-top: 1px solid rgba(255,255,255,0.05); }
+.ios-hint { background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.2); border-radius: 6px; padding: 8px 12px; margin-top: 10px; font-size: 12px; color: #d4b84c; }
+
+#backToTop {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 999;
+    background: rgba(30, 30, 36, 0.85);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    transition: opacity 0.3s, transform 0.2s, visibility 0.3s;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+#backToTop.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+#backToTop:hover {
+    background: rgba(50, 205, 50, 0.25);
+    border-color: var(--accent);
+    transform: scale(1.05);
+}
+#backToTop:active { transform: scale(0.95); }
+@media (max-width: 640px) {
+    #backToTop { width: 44px; height: 44px; font-size: 20px; bottom: 20px; right: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== ФОН С АВТОЗВУКОМ ===== -->
+<svg class="bg-auto-sound" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <animate id="flow1" attributeName="stroke-dashoffset" from="0" to="5" dur="0.6s" repeatCount="indefinite" />
+        <animate id="flow2" attributeName="stroke-dashoffset" from="0" to="5" dur="0.5s" repeatCount="indefinite" />
+        <animate id="flow3" attributeName="stroke-dashoffset" from="0" to="5" dur="0.7s" repeatCount="indefinite" />
+        <animate id="flow4" attributeName="stroke-dashoffset" from="0" to="5" dur="0.55s" repeatCount="indefinite" />
+        <animate id="flow5" attributeName="stroke-dashoffset" from="0" to="5" dur="0.65s" repeatCount="indefinite" />
+    </defs>
+
+    <!-- ===== МАГНИТОЛА (центр) ===== -->
+    <g transform="translate(50, 42)">
+        <rect x="-10" y="-6" width="20" height="12" rx="0.8" class="hu-body" />
+        <rect x="-8" y="-4" width="16" height="6" rx="0.5" class="hu-screen" />
+        <circle cx="-4" cy="2.5" r="0.8" class="hu-btn" />
+        <circle cx="0" cy="2.5" r="0.8" class="hu-btn" />
+        <circle cx="4" cy="2.5" r="0.8" class="hu-btn" />
+        <rect x="-5" y="-2" width="1" height="2" fill="#32cd32" opacity="0.7"><animate attributeName="height" values="1.5;3;1.5" dur="0.8s" repeatCount="indefinite" /></rect>
+        <rect x="-2" y="-1.5" width="1" height="1.5" fill="#32cd32" opacity="0.7"><animate attributeName="height" values="2;1;2" dur="1s" repeatCount="indefinite" /></rect>
+        <rect x="1" y="-2.5" width="1" height="3" fill="#32cd32" opacity="0.7"><animate attributeName="height" values="1.5;3.5;1.5" dur="0.7s" repeatCount="indefinite" /></rect>
+        <rect x="4" y="-2" width="1" height="2" fill="#32cd32" opacity="0.7"><animate attributeName="height" values="2.5;1;2.5" dur="1.2s" repeatCount="indefinite" /></rect>
+    </g>
+
+    <!-- ===== ДИНАМИКИ ПО УГЛАМ ===== -->
+    <g transform="translate(10, 15)">
+        <circle cx="0" cy="0" r="8" class="speaker-ring" />
+        <circle cx="0" cy="0" r="6" class="speaker-ring" stroke-width="0.4" />
+        <circle cx="0" cy="0" r="4" class="speaker-cone" />
+        <circle cx="0" cy="0" r="1.5" class="speaker-center" />
+        <path d="M-4,0 Q0,-3 4,0" stroke="#8a9ba8" stroke-width="0.3" fill="none" opacity="0.7" />
+        <text x="0" y="-11" text-anchor="middle" fill="#c0d0e0" font-size="2.5" font-weight="bold">FL</text>
+    </g>
+    <g transform="translate(90, 15)">
+        <circle cx="0" cy="0" r="8" class="speaker-ring" />
+        <circle cx="0" cy="0" r="6" class="speaker-ring" stroke-width="0.4" />
+        <circle cx="0" cy="0" r="4" class="speaker-cone" />
+        <circle cx="0" cy="0" r="1.5" class="speaker-center" />
+        <path d="M-4,0 Q0,-3 4,0" stroke="#8a9ba8" stroke-width="0.3" fill="none" opacity="0.7" />
+        <text x="0" y="-11" text-anchor="middle" fill="#c0d0e0" font-size="2.5" font-weight="bold">FR</text>
+    </g>
+    <g transform="translate(10, 78)">
+        <circle cx="0" cy="0" r="8" class="speaker-ring" />
+        <circle cx="0" cy="0" r="6" class="speaker-ring" stroke-width="0.4" />
+        <circle cx="0" cy="0" r="4" class="speaker-cone" />
+        <circle cx="0" cy="0" r="1.5" class="speaker-center" />
+        <path d="M-4,0 Q0,-3 4,0" stroke="#8a9ba8" stroke-width="0.3" fill="none" opacity="0.7" />
+        <text x="0" y="-11" text-anchor="middle" fill="#c0d0e0" font-size="2.5" font-weight="bold">RL</text>
+    </g>
+    <g transform="translate(90, 78)">
+        <circle cx="0" cy="0" r="8" class="speaker-ring" />
+        <circle cx="0" cy="0" r="6" class="speaker-ring" stroke-width="0.4" />
+        <circle cx="0" cy="0" r="4" class="speaker-cone" />
+        <circle cx="0" cy="0" r="1.5" class="speaker-center" />
+        <path d="M-4,0 Q0,-3 4,0" stroke="#8a9ba8" stroke-width="0.3" fill="none" opacity="0.7" />
+        <text x="0" y="-11" text-anchor="middle" fill="#c0d0e0" font-size="2.5" font-weight="bold">RR</text>
+    </g>
+
+    <!-- ===== САБВУФЕР ===== -->
+    <g transform="translate(50, 85)">
+        <circle cx="0" cy="0" r="9" class="speaker-ring" stroke="#ff4500" stroke-width="0.8" />
+        <circle cx="0" cy="0" r="7" class="speaker-ring" stroke="#ff4500" stroke-width="0.4" opacity="0.6" />
+        <circle cx="0" cy="0" r="5" class="speaker-cone" stroke="#8a9ba8" stroke-width="0.4" />
+        <circle cx="0" cy="0" r="2" class="speaker-center" fill="#3a4a5a" stroke="#ff4500" stroke-width="0.4" />
+        <text x="0" y="-11" text-anchor="middle" fill="#ff4500" font-size="2.5" font-weight="bold">SUB</text>
+    </g>
+
+    <!-- ===== ПРОВОДА ===== -->
+    <path d="M40,42 L20,24 L10,15" class="wire wire-blue" stroke-dashoffset="0">
+        <animate attributeName="stroke-dashoffset" from="0" to="5" dur="0.6s" repeatCount="indefinite" />
+    </path>
+    <path d="M60,42 L80,24 L90,15" class="wire wire-purple" stroke-dashoffset="0">
+        <animate attributeName="stroke-dashoffset" from="0" to="5" dur="0.5s" repeatCount="indefinite" />
+    </path>
+    <path d="M42,48 L20,60 L10,78" class="wire wire-orange" stroke-dashoffset="0">
+        <animate attributeName="stroke-dashoffset" from="0" to="5" dur="0.7s" repeatCount="indefinite" />
+    </path>
+    <path d="M58,48 L80,60 L90,78" class="wire wire-green" stroke-dashoffset="0">
+        <animate attributeName="stroke-dashoffset" from="0" to="5" dur="0.55s" repeatCount="indefinite" />
+    </path>
+    <path d="M50,48 L50,65 L50,85" class="wire wire-red" stroke-dashoffset="0">
+        <animate attributeName="stroke-dashoffset" from="0" to="5" dur="0.65s" repeatCount="indefinite" />
+    </path>
+
+    <!-- ===== ТОКИ ===== -->
+    <circle class="dot" stroke="none">
+        <animateMotion dur="0.6s" repeatCount="indefinite" path="M40,42 L20,24 L10,15" />
+    </circle>
+    <circle class="dot dot-blue" stroke="none">
+        <animateMotion dur="0.6s" repeatCount="indefinite" path="M40,42 L20,24 L10,15" begin="0.2s" />
+    </circle>
+    <circle class="dot dot-purple" stroke="none">
+        <animateMotion dur="0.5s" repeatCount="indefinite" path="M60,42 L80,24 L90,15" />
+    </circle>
+    <circle class="dot dot-purple" stroke="none">
+        <animateMotion dur="0.5s" repeatCount="indefinite" path="M60,42 L80,24 L90,15" begin="0.17s" />
+    </circle>
+    <circle class="dot dot-orange" stroke="none">
+        <animateMotion dur="0.7s" repeatCount="indefinite" path="M42,48 L20,60 L10,78" />
+    </circle>
+    <circle class="dot dot-orange" stroke="none">
+        <animateMotion dur="0.7s" repeatCount="indefinite" path="M42,48 L20,60 L10,78" begin="0.25s" />
+    </circle>
+    <circle class="dot" stroke="none" fill="#32cd32">
+        <animateMotion dur="0.55s" repeatCount="indefinite" path="M58,48 L80,60 L90,78" />
+    </circle>
+    <circle class="dot" stroke="none" fill="#32cd32">
+        <animateMotion dur="0.55s" repeatCount="indefinite" path="M58,48 L80,60 L90,78" begin="0.18s" />
+    </circle>
+    <circle class="dot dot-red" stroke="none">
+        <animateMotion dur="0.65s" repeatCount="indefinite" path="M50,48 L50,65 L50,85" />
+    </circle>
+    <circle class="dot dot-red" stroke="none">
+        <animateMotion dur="0.65s" repeatCount="indefinite" path="M50,48 L50,65 L50,85" begin="0.22s" />
+    </circle>
+</svg>
+
+<!-- ===== КНОПКА "НАВЕРХ" ===== -->
+<button id="backToTop" aria-label="Вернуться в начало" title="Вернуться в начало">↑</button>
+
+<!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
+<div class="container">
+    <div class="header" id="top">
+        <h1>Бортовой Журнал Аудиосистемы</h1>
+        <p>Honda Accord 6 • Поканальный SQ-Фронт + Сабвуфер</p>
+    </div>
+
+    <div class="toc-box">
+        <div class="toc-title">🗺️ Содержание</div>
+        <ul class="toc-list">
+            <li>📌 <a href="#sec1" class="t-c1">Раздел 1. Железо</a>
+                <ul class="toc-sublist">
+                    <li>📀 <a href="#hardware-pioneer">Pioneer AVH-X4800DVD</a></li>
+                    <li>🔊 <a href="#hardware-hertz">Hertz DSK 165.3</a></li>
+                    <li>🥁 <a href="#hardware-dynamic">Dynamic State SLC-16M</a></li>
+                    <li>⚡ <a href="#hardware-deaf">Deaf Bonce MLA-600.1</a></li>
+                    <li>🔊 <a href="#hardware-machete">Machete ML-10R D2</a></li>
+                </ul>
+            </li>
+            <li>📌 <a href="#sec2" class="t-c2">Раздел 2. Шумка</a>
+                <ul class="toc-sublist">
+                    <li>🚪 <a href="#shumka-front">Передние двери (премиум)</a></li>
+                    <li>🚗 <a href="#shumka-rear">Задние двери (бюджет)</a></li>
+                </ul>
+            </li>
+            <li>📌 <a href="#sec3" class="t-c3">Раздел 3. Коммутация</a>
+                <ul class="toc-sublist">
+                    <li>🔺 <a href="#comm-mid">Канал MID → Перед</a></li>
+                    <li>🟩 <a href="#comm-high">Канал HIGH → Зад</a></li>
+                    <li>🟪 <a href="#comm-low">Канал LOW → Саб</a></li>
+                </ul>
+            </li>
+            <li>📌 <a href="#sec4" class="t-c4">Раздел 4. Процессор</a>
+                <ul class="toc-sublist">
+                    <li>🔊 <a href="#b-subbass">Блок 1. Суббас</a></li>
+                    <li>🥁 <a href="#b-midbass">Блок 2. Мидбас</a></li>
+                    <li>🎤 <a href="#b-vocal">Блок 3. Середина (Вокал)</a></li>
+                    <li>🔺 <a href="#b-tweeter">Блок 4. Твитеры</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="controls">
+        <button id="expandAllBtn">📂 Развернуть всё</button>
+        <button id="collapseAllBtn">📁 Свернуть всё</button>
+    </div>
+
+    <!-- РАЗДЕЛ 1 -->
+    <details id="sec1" class="block block-hardware">
+        <summary class="block-title"><span>📦 Раздел 1. Компоненты Железа</span><span class="arrow-icon">▼</span></summary>
+        <div class="block-content">
+            <details id="hardware-pioneer" class="hardware-detail">
+                <summary class="hardware-detail-summary">
+                    <span><span class="hardware-detail-title">📀 Pioneer AVH-X4800DVD</span> <span class="hardware-detail-preview">Главный мозг, сетевой режим</span></span>
+                    <span class="hardware-arrow-icon">▼</span>
+                </summary>
+                <div class="hardware-detail-content">
+                    <svg class="detail-photo" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="120" fill="#1a1a22"/>
+                        <rect x="40" y="20" width="320" height="80" rx="8" fill="#1e90ff" opacity="0.2"/>
+                        <rect x="60" y="30" width="280" height="40" rx="4" fill="#1e90ff" opacity="0.3"/>
+                        <text x="200" y="55" text-anchor="middle" fill="#1e90ff" font-size="18" font-weight="bold">Pioneer</text>
+                        <text x="200" y="75" text-anchor="middle" fill="#a0aec0" font-size="12">AVH-X4800DVD</text>
+                        <circle cx="80" cy="95" r="4" fill="#32cd32" opacity="0.8"/>
+                        <circle cx="320" cy="95" r="4" fill="#32cd32" opacity="0.8"/>
+                    </svg>
+                    <ul class="spec-list">
+                        <li><span class="accent-text">Мощность:</span> 4×50 Вт (RMS), 4×80 Вт (макс.)</li>
+                        <li><span class="accent-text">Экран:</span> 6.2" TFT, разрешение 800×480</li>
+                        <li><span class="accent-text">ЦАП:</span> 24‑битный, высокое качество</li>
+                        <li><span class="accent-text">Разъёмы:</span> 3 пары RCA (Front/Rear/Sub), USB, AUX, HDMI (опционально)</li>
+                        <li><span class="accent-text">Сетевой режим:</span> 3‑полосный кроссовер, задержки до 10 мс</li>
+                        <li><span class="accent-text">Поддержка:</span> FLAC, WAV, MP3, WMA, AAC</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details id="hardware-hertz" class="hardware-detail">
+                <summary class="hardware-detail-summary">
+                    <span><span class="hardware-detail-title">🔊 Hertz DSK 165.3</span> <span class="hardware-detail-preview">2‑компонентная, 16.5 см, 93 дБ</span></span>
+                    <span class="hardware-arrow-icon">▼</span>
+                </summary>
+                <div class="hardware-detail-content">
+                    <svg class="detail-photo" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="120" fill="#1a1a22"/>
+                        <circle cx="200" cy="60" r="40" fill="none" stroke="#1e90ff" stroke-width="3"/>
+                        <circle cx="200" cy="60" r="28" fill="none" stroke="#1e90ff" stroke-width="1.5" opacity="0.5"/>
+                        <circle cx="200" cy="60" r="8" fill="#1e90ff" opacity="0.5"/>
+                        <text x="200" y="110" text-anchor="middle" fill="#a0aec0" font-size="12">Hertz DSK 165.3</text>
+                    </svg>
+                    <ul class="spec-list">
+                        <li><span class="accent-text">Тип:</span> 2‑компонентная акустика</li>
+                        <li><span class="accent-text">Диаметр:</span> 16.5 см (6.5")</li>
+                        <li><span class="accent-text">Мощность (RMS / пик):</span> 100 Вт / 200 Вт</li>
+                        <li><span class="accent-text">Импеданс:</span> 4 Ом</li>
+                        <li><span class="accent-text">Чувствительность:</span> 93 дБ</li>
+                        <li><span class="accent-text">Диапазон частот:</span> 50 Гц – 22 кГц</li>
+                        <li><span class="accent-text">Кроссовер:</span> внешний, частота раздела 3.5 кГц</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details id="hardware-dynamic" class="hardware-detail">
+                <summary class="hardware-detail-summary">
+                    <span><span class="hardware-detail-title">🥁 Dynamic State SLC-16M</span> <span class="hardware-detail-preview">Мидвуфер 16.5 см, бумага</span></span>
+                    <span class="hardware-arrow-icon">▼</span>
+                </summary>
+                <div class="hardware-detail-content">
+                    <svg class="detail-photo" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="120" fill="#1a1a22"/>
+                        <circle cx="200" cy="60" r="40" fill="none" stroke="#9370db" stroke-width="3"/>
+                        <circle cx="200" cy="60" r="28" fill="none" stroke="#9370db" stroke-width="1.5" opacity="0.5"/>
+                        <path d="M170 60 Q185 40 200 60 Q215 80 230 60" stroke="#9370db" stroke-width="2" fill="none"/>
+                        <text x="200" y="110" text-anchor="middle" fill="#a0aec0" font-size="12">Dynamic State SLC-16M</text>
+                    </svg>
+                    <ul class="spec-list">
+                        <li><span class="accent-text">Тип:</span> Мидвуфер (без твитера)</li>
+                        <li><span class="accent-text">Диаметр:</span> 16.5 см (6.5")</li>
+                        <li><span class="accent-text">Мощность (RMS / пик):</span> 80 Вт / 160 Вт</li>
+                        <li><span class="accent-text">Импеданс:</span> 4 Ом</li>
+                        <li><span class="accent-text">Чувствительность:</span> 91 дБ</li>
+                        <li><span class="accent-text">Диапазон частот:</span> 50 Гц – 5 кГц</li>
+                        <li><span class="accent-text">Материал диффузора:</span> прессованная целлюлоза</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details id="hardware-deaf" class="hardware-detail">
+                <summary class="hardware-detail-summary">
+                    <span><span class="hardware-detail-title">⚡ Deaf Bonce MLA‑600.1</span> <span class="hardware-detail-preview">Моноблок, 600 Вт @ 1 Ом</span></span>
+                    <span class="hardware-arrow-icon">▼</span>
+                </summary>
+                <div class="hardware-detail-content">
+                    <svg class="detail-photo" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="120" fill="#1a1a22"/>
+                        <rect x="50" y="20" width="300" height="80" rx="6" fill="#ff8c00" opacity="0.2"/>
+                        <text x="200" y="55" text-anchor="middle" fill="#ff8c00" font-size="18" font-weight="bold">Deaf Bonce</text>
+                        <text x="200" y="75" text-anchor="middle" fill="#a0aec0" font-size="12">MLA-600.1</text>
+                        <rect x="100" y="85" width="40" height="12" rx="3" fill="#32cd32" opacity="0.5"/>
+                        <rect x="260" y="85" width="40" height="12" rx="3" fill="#32cd32" opacity="0.5"/>
+                    </svg>
+                    <ul class="spec-list">
+                        <li><span class="accent-text">Мощность:</span> 600 Вт при 1 Ом, 400 Вт при 2 Ом, 200 Вт при 4 Ом</li>
+                        <li><span class="accent-text">Класс:</span> D</li>
+                        <li><span class="accent-text">Фильтры:</span> Subsonic (10–50 Гц), LPF (40–150 Гц), Bass Boost (0–12 дБ на 45 Гц)</li>
+                        <li><span class="accent-text">Защита:</span> от КЗ, перегрева, перегрузки</li>
+                        <li><span class="accent-text">Габариты:</span> компактный корпус</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details id="hardware-machete" class="hardware-detail">
+                <summary class="hardware-detail-summary">
+                    <span><span class="hardware-detail-title">🔊 Machete ML‑10R D2</span> <span class="hardware-detail-preview">10" сабвуфер, 2+2 Ом</span></span>
+                    <span class="hardware-arrow-icon">▼</span>
+                </summary>
+                <div class="hardware-detail-content">
+                    <svg class="detail-photo" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="120" fill="#1a1a22"/>
+                        <circle cx="200" cy="60" r="45" fill="none" stroke="#ff4500" stroke-width="3"/>
+                        <circle cx="200" cy="60" r="32" fill="none" stroke="#ff4500" stroke-width="1.5" opacity="0.5"/>
+                        <circle cx="200" cy="60" r="14" fill="#ff4500" opacity="0.2"/>
+                        <text x="200" y="112" text-anchor="middle" fill="#a0aec0" font-size="12">Machete ML-10R D2</text>
+                    </svg>
+                    <ul class="spec-list">
+                        <li><span class="accent-text">Тип:</span> Сабвуфер 10" (25 см)</li>
+                        <li><span class="accent-text">Мощность (RMS / пик):</span> 300 Вт / 600 Вт</li>
+                        <li><span class="accent-text">Импеданс:</span> 2+2 Ом (Dual 2 Ом)</li>
+                        <li><span class="accent-text">Диапазон частот:</span> 30–200 Гц</li>
+                        <li><span class="accent-text">Рекомендуемый короб:</span> ФИ 35 л, порт 36 Гц</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+    </details>
+
+    <!-- РАЗДЕЛ 2 -->
+    <details id="sec2" class="block block-shumka">
+        <summary class="block-title"><span>🧱 Раздел 2. Шумоизоляция Дверей</span><span class="arrow-icon">▼</span></summary>
+        <div class="block-content">
+            <details id="shumka-front" class="material-detail">
+                <summary class="material-summary">
+                    <span><span class="material-title">🚪 Передние двери (Премиум 3-слойный пирог)</span> <span class="material-preview">StP Aero + Biplast Premium</span></span>
+                    <span class="material-arrow-icon">▼</span>
+                </summary>
+                <div class="material-detail-content">
+                    <svg class="detail-photo" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="120" fill="#1a1a22"/>
+                        <rect x="40" y="20" width="320" height="80" rx="6" fill="#9370db" opacity="0.2"/>
+                        <text x="200" y="50" text-anchor="middle" fill="#9370db" font-size="16">StP Aero 2mm</text>
+                        <text x="200" y="72" text-anchor="middle" fill="#a0aec0" font-size="12">+ Biplast Premium 15A</text>
+                        <rect x="80" y="85" width="20" height="8" fill="#32cd32" opacity="0.4"/>
+                        <rect x="110" y="85" width="20" height="8" fill="#32cd32" opacity="0.4"/>
+                        <rect x="140" y="85" width="20" height="8" fill="#32cd32" opacity="0.4"/>
+                    </svg>
+                    <ul class="spec-list">
+                        <li><span class="accent-text">Виброизоляция (слой 1):</span> StP Aero 2 мм – битумно-полимерный материал, эффективно гасит резонансы металла.</li>
+                        <li><span class="accent-text">Звукопоглотитель (слой 2):</span> StP Biplast Premium 15A (Armor) – пена с пирамидками, снижает шум в диапазоне 200–5000 Гц.</li>
+                        <li><span class="accent-text">Монтаж АС:</span> Кольца 15-18 мм из МДФ, клеммы запечатаны термоусадкой.</li>
+                        <li><span class="accent-text">Коэффициент звукопоглощения:</span> до 0.85 на средних частотах.</li>
+                        <li><span class="accent-text">Температурный диапазон:</span> -40°C … +80°C.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details id="shumka-rear" class="material-detail">
+                <summary class="material-summary">
+                    <span><span class="material-title">🚗 Задние двери (Бюджетный эффективный пирог)</span> <span class="material-preview">StP Legend + Biplast Wave</span></span>
+                    <span class="material-arrow-icon">▼</span>
+                </summary>
+                <div class="material-detail-content">
+                    <svg class="detail-photo" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="120" fill="#1a1a22"/>
+                        <rect x="40" y="20" width="320" height="80" rx="6" fill="#9370db" opacity="0.15"/>
+                        <text x="200" y="50" text-anchor="middle" fill="#9370db" font-size="16">StP Legend 2.0</text>
+                        <text x="200" y="72" text-anchor="middle" fill="#a0aec0" font-size="12">+ Biplast Wave</text>
+                        <rect x="100" y="85" width="15" height="8" fill="#32cd32" opacity="0.3"/>
+                        <rect x="125" y="85" width="15" height="8" fill="#32cd32" opacity="0.3"/>
+                        <rect x="150" y="85" width="15" height="8" fill="#32cd32" opacity="0.3"/>
+                    </svg>
+                    <ul class="spec-list">
+                        <li><span class="accent-text">Виброизоляция (слой 1):</span> StP Legend 2.0 – битумно-полимерный материал толщиной 2 мм, отличная цепкость.</li>
+                        <li><span class="accent-text">Звукопоглотитель (слой 2):</span> StP Biplast Premium 15A или Biplast 15 Wave – открытоячеистая пена.</li>
+                        <li><span class="accent-text">Герметизация:</span> На торец кольца клеится уплотнительная лента из обрезков Biplast.</li>
+                        <li><span class="accent-text">Коэффициент звукопоглощения:</span> до 0.75.</li>
+                        <li><span class="accent-text">Температурный диапазон:</span> -30°C … +70°C.</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+    </details>
+
+    <!-- РАЗДЕЛ 3 -->
+    <details id="sec3" class="block block-commutation">
+        <summary class="block-title"><span>🔌 Раздел 3. Физическая Коммутация в Сетевом Режиме</span><span class="arrow-icon">▼</span></summary>
+        <div class="block-content">
+            <details id="comm-mid" class="material-detail">
+                <summary class="material-summary">
+                    <span><span class="material-title">🔺 Канал MID (Выходы REAR) → Передние двери</span></span>
+                    <span class="material-arrow-icon">▼</span>
+                </summary>
+                <div class="material-detail-content">
+                    <ul class="spec-list">
+                        <li><span class="accent-text">Провода:</span> От Rear идут напрямую к пассивным кроссоверам Hertz DX 300 в дверях.</li>
+                        <li><span class="accent-text">Принцип:</span> Родные кроссы сами делят сигнал на мидбас и твитер на месте.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details id="comm-high" class="material-detail">
+                <summary class="material-summary">
+                    <span><span class="material-title">🟩 Канал HIGH (Выходы FRONT) → Задние двери</span></span>
+                    <span class="material-arrow-icon">▼</span>
+                </summary>
+                <div class="material-detail-content">
+                    <ul class="spec-list">
+                        <li><span class="accent-text">Провода:</span> От Front тянутся к новым мидбасам Dynamic State SLC-16M.</li>
+                        <li><span class="accent-text">Принцип:</span> Канал HIGH на Pioneer аппаратно выделен под независимый тыл (Rear Fill).</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details id="comm-low" class="material-detail">
+                <summary class="material-summary">
+                    <span><span class="material-title">🟪 Канал LOW (Выходы RCA) → Сабвуферное звено</span></span>
+                    <span class="material-arrow-icon">▼</span>
+                </summary>
+                <div class="material-detail-content">
+                    <ul class="spec-list">
+                        <li><span class="accent-text">Провода:</span> Межблочный кабель связывает нижнюю пару разъемов Pioneer с моноблоком.</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+    </details>
+
+    <!-- РАЗДЕЛ 4 -->
+    <details id="sec4" class="block block-processor">
+        <summary class="block-title"><span>🎛️ Раздел 4. Программные Настройки Процессора</span><span class="arrow-icon">▼</span></summary>
+        <div class="block-content">
+            <div class="info-card">
+                <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px; color: #fff;">📐 Кроссовер и Задержки</div>
+                <ul class="spec-list">
+                    <li><span class="accent-text">MID:</span> ФВЧ <span class="alert-text">80 Hz</span> (-12 dB/oct). ФНЧ полностью <span class="alert-text">ОТКЛЮЧЕН (Выкл)</span>.</li>
+                    <li><span class="accent-text">HIGH (Новый зад):</span> Фильтр ФВЧ включен на <span class="alert-text">80 Hz</span> или <span class="alert-text">100 Hz</span> (-12 dB/oct).</li>
+                    <li><span class="accent-text">LOW (Сабвуфер):</span> Фильтр ФНЧ <span class="alert-text">80 Hz</span> (-12 dB/oct). Фаза: <span class="alert-text">Reverse</span>.</li>
+                    <li><span class="accent-text">Задержки:</span> Режим <span class="alert-text">«Фронт. пр.»</span> (Лево: ВЧ -3 dB, СЧ -4 dB; Право: 0 dB).</li>
+                </ul>
+            </div>
+
+            <details id="b-subbass" class="sub-block c-subbass">
+                <summary class="sub-block-title"><span>🔊 Блок 1. Subbass (Субнизкие частоты)</span><span class="sub-arrow-icon">▼</span></summary>
+                <div class="sub-block-content">
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 50 Гц (50 Hz)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Зона нижнего регистра суббасового диапазона. Влияет на физическое звуковое давление (дБ).</div>
+                        <div class="lang-line"><span class="lang-badge">Доступный:</span> Самый низкий, глубокий жирный бас. Самый сок для негритянского рэпа и клубных треков.</div>
+                    </div>
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 80 Гц (80 Hz)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Верхняя граница суббаса, зона стыка сабвуферного звена и фронтальных мидбасов.</div>
+                        <div class="lang-line"><span class="lang-badge">Доступный:</span> Плотный, массивный бас. Звук глубокой бас-гитары и тяжелой электронной бочки (кика).</div>
+                    </div>
+                </div>
+            </details>
+
+            <details id="b-midbass" class="sub-block c-midbass">
+                <summary class="sub-block-title"><span>🥁 Блок 2. Мидбас (Низкие частоты)</span><span class="sub-arrow-icon">▼</span></summary>
+                <div class="sub-block-content">
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 125 Гц (125 Hz)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Зона перехода от суббаса к мидбасовому регистру. Определяет полноту звучания нижнего регистра мужского вокала.</div>
+                        <div class="lang-line"><span class="lang-badge">Доступный:</span> Дает басу читаемость. Если ее слишком много - в дверях начнется гул, если мало - бас покажется сухим.</div>
+                    </div>
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 200 Гц (200 Hz)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Центральная частота мидбасового диапазона. Отвечает за динамику и плотность акустического удара в дверях.</div>
+                        <div class="lang-line"><span class="lang-badge"><span class='hit-mark'>ХИТ ПРОГРАММЫ (+2).</span> Частота панча. Сочный, четкий удар барабана прямо в грудь.</span></div>
+                    </div>
+                </div>
+            </details>
+
+            <details id="b-vocal" class="sub-block c-vocal">
+                <summary class="sub-block-title"><span>🎤 Блок 3. Нижняя и средняя середина (Вокал)</span><span class="sub-arrow-icon">▼</span></summary>
+                <div class="sub-block-content">
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 315 Гц и 500 Гц (315 Hz / 500 Hz)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Нижний диапазон средних частот (СЧ). Определяет тело голоса и фундаментальные частоты вокала.</div>
+                        <div class="lang-line"><span class="lang-badge">Доступный:</span> Отвечает за теплоту звука. Если эти частоты сильно убавить - музыка станет плоской, как из ведра.</div>
+                    </div>
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 800 Гц и 1.25 кГц (800 Hz / 1.25k)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Центральная область средних частот. Зона максимальной чувствительности уха к различению интонаций вокала.</div>
+                        <div class="lang-line"><span class="lang-badge"><span class='alert-text'>ЗАЖАТО В -1.</span> Частота крикливости голоса. Приглушена, чтобы исполнитель на высокой громкости не орал в уши.</span></div>
+                    </div>
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 2 кГц (2k)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Верхняя середина. Накатывает атаку инструментов, разборчивость текста и детальность струнных партий.</div>
+                        <div class="lang-line"><span class="lang-badge">Доступный:</span> Отвечает за эффект присутствия артиста в салоне. Делает речь разборчивой.</div>
+                    </div>
+                </div>
+            </details>
+
+            <details id="b-tweeter" class="sub-block c-tweeter">
+                <summary class="sub-block-title"><span>🔺 Блок 4. Upper Midrange и Высокие частоты (Зона твитеров)</span><span class="sub-arrow-icon">▼</span></summary>
+                <div class="sub-block-content">
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 3.15 кГц (3.15k)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Зона раздела частот двухполосного фронта. Отвечает за яркость и атаку звука.</div>
+                        <div class="lang-line"><span class="lang-badge"><span class='alert-text'>ЗАЖАТО В -1.</span> Граница между вокалом и пищалкой. Смягчает переход звука из двери наверх, к твитерам.</span></div>
+                    </div>
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 5 кГц (5k)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Нижний регистр высоких частот (ВЧ). Отвечает за звонкость. Вызывает максимальную утомляемость слуха при избытке.</div>
+                        <div class="lang-line"><span class="lang-badge"><span class='alert-text'>ЗАЖАТО В -4.</span> Частота визга. У Hertz Dieci тут резкий горб. Настройка полностью убирает металлический визг.</span></div>
+                    </div>
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 8 кГц (8k)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Средний регистр ВЧ-диапазона. Отвечает за сибилянты (звуки с, ц, щ) и шлейф ударных тарелок.</div>
+                        <div class="lang-line"><span class="lang-badge"><span class='alert-text'>ЗАЖАТО В -3.</span> Частота цоканья. Полностью убирает едкий скрежет и делает свистящие звуки мягкими.</span></div>
+                    </div>
+                    <div class="frequency-card">
+                        <div class="freq-header">★ 12.5 кГц (12.5k)</div>
+                        <div class="lang-line"><span class="lang-badge">Научный:</span> Самый верхний регистр звукового диапазона. Отвечает за микродетализацию, воздух и прозрачность стереокартины.</div>
+                        <div class="lang-line"><span class="lang-badge"><span class='alert-text'>ЗАЖАТО В -3.</span> Песок и воздух. Тонкое шуршание мелких тарелочек. Приглушено для защиты слуха в долгих поездках.</span></div>
+                    </div>
+                </div>
+            </details>
+        </div>
+    </details>
+
+    <div class="footer">
+        Все настройки зафиксированы в памяти Pioneer через меню «Сохранить настройки».<br>
+        Бортовой журнал аудиосистемы Honda Accord 6 • 2026 год.
+        <div class="ios-hint">📱 На iOS: если страница открылась как документ, нажмите «Поделиться» → «Открыть в Safari» для полной функциональности.</div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let _ignoreAccordion = false;
+
+    // ---- Кнопка "Наверх" ----
+    const backBtn = document.getElementById('backToTop');
+    function toggleBackButton() {
+        if (window.scrollY > 300) {
+            backBtn.classList.add('visible');
+        } else {
+            backBtn.classList.remove('visible');
+        }
+    }
+    window.addEventListener('scroll', toggleBackButton, { passive: true });
+    window.addEventListener('resize', toggleBackButton, { passive: true });
+    toggleBackButton();
+    backBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ---- Обработка ссылок ----
+    const links = document.querySelectorAll('a[href^="#"]');
+
+    function updateActiveLink(hash) {
+        links.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`a[href="${hash}"]`);
+        if (activeLink) activeLink.classList.add('active');
+    }
+
+    function openParents(el) {
+        let p = el;
+        while (p) {
+            if (p.tagName === "DETAILS") {
+                if (!p.open) {
+                    p.open = true;
+                    const summary = p.querySelector('summary');
+                    if (summary && !p.open) {
+                        summary.click();
+                    }
+                }
+            }
+            p = p.parentElement;
+        }
+        if (el.tagName === "DETAILS" && !el.open) {
+            el.open = true;
+            const summary = el.querySelector('summary');
+            if (summary && !el.open) {
+                summary.click();
+            }
+        }
+    }
+
+    function go(hash, push = true) {
+        if (!hash) return;
+        const id = hash.replace('#', '');
+        const el = document.getElementById(id);
+        if (!el) return;
+        openParents(el);
+        setTimeout(function() {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+        if (push && location.hash !== hash) {
+            history.pushState(null, '', hash);
+        }
+        updateActiveLink(hash);
+    }
+
+    links.forEach(function(a) {
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            go(this.getAttribute('href'));
+        });
+    });
+
+    window.addEventListener('hashchange', function() {
+        go(location.hash, false);
+    });
+
+    if (location.hash) {
+        setTimeout(function() {
+            go(location.hash, false);
+        }, 100);
+    }
+
+    // ---- Аккордеон ----
+    function closeAllNestedDetails(parent) {
+        const details = parent.querySelectorAll('details');
+        details.forEach(d => d.open = false);
+    }
+
+    const blocks = document.querySelectorAll('.block');
+    blocks.forEach(function(block) {
+        block.addEventListener('toggle', function(e) {
+            if (_ignoreAccordion) return;
+            if (this.open) {
+                blocks.forEach(function(other) {
+                    if (other !== this && other.open) {
+                        other.open = false;
+                        closeAllNestedDetails(other);
+                    }
+                });
+            } else {
+                closeAllNestedDetails(this);
+            }
+        });
+    });
+
+    const subBlocks = document.querySelectorAll('.sub-block');
+    subBlocks.forEach(function(sub) {
+        sub.addEventListener('toggle', function(e) {
+            if (_ignoreAccordion) return;
+            if (this.open) {
+                subBlocks.forEach(function(other) {
+                    if (other !== this && other.open) {
+                        other.open = false;
+                        closeAllNestedDetails(other);
+                    }
+                });
+            }
+        });
+    });
+
+    const allDetails = document.querySelectorAll('.hardware-detail, .material-detail');
+    allDetails.forEach(function(detail) {
+        detail.addEventListener('toggle', function(e) {
+            if (_ignoreAccordion) return;
+            if (this.open) {
+                allDetails.forEach(function(other) {
+                    if (other !== this && other.open) {
+                        other.open = false;
+                    }
+                });
+            }
+        });
+    });
+
+    // ---- Кнопки "Развернуть всё" / "Свернуть всё" ----
+    const expandBtn = document.getElementById('expandAllBtn');
+    const collapseBtn = document.getElementById('collapseAllBtn');
+
+    function getAllDetails() {
+        return document.querySelectorAll('.container details');
+    }
+
+    expandBtn.addEventListener('click', function() {
+        _ignoreAccordion = true;
+        const all = getAllDetails();
+        all.forEach(function(d) {
+            if (!d.open) {
+                d.open = true;
+                const summary = d.querySelector('summary');
+                if (summary && !d.open) {
+                    summary.click();
+                }
+            }
+        });
+        setTimeout(function() { _ignoreAccordion = false; }, 200);
+    });
+
+    collapseBtn.addEventListener('click', function() {
+        _ignoreAccordion = true;
+        getAllDetails().forEach(function(d) {
+            if (d.open) {
+                d.open = false;
+            }
+        });
+        setTimeout(function() { _ignoreAccordion = false; }, 200);
+    });
+
+    // ---- aria-expanded ----
+    document.querySelectorAll('details').forEach(function(d) {
+        d.addEventListener('toggle', function() {
+            const s = d.querySelector('summary');
+            if (s) s.setAttribute('aria-expanded', d.open ? 'true' : 'false');
+        });
+        const s = d.querySelector('summary');
+        if (s) s.setAttribute('aria-expanded', d.open ? 'true' : 'false');
+    });
+});
+</script>
+</body>
+</html>
